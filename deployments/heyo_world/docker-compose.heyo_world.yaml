@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  heyo:
+    image: heyo-world:latest
+    container_name: heyo
+    
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.heyo.rule=Host(`heyo.${DOMAIN}`)"
+      - "traefik.port=80"
+      - "traefik.http.routers.heyo.tls.certresolver=le"
+      - "traefik.http.routers.heyo.entrypoints=websecure"
+
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://drawio:8080 || exit 1"]
+    #   interval: 1m30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 10s
+    # ports:
+    #   - "443:80"
+    networks:
+      - docker-gui-network
+networks:
+  docker-gui-network:
+    # name: docker-gui-network #docker compose will generate a name if not specified
+
+
