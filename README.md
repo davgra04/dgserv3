@@ -3,9 +3,6 @@ dgserv3
 
 dgserv3 is a Terraform project for managing personal websites in AWS. Sites are hosted as docker containers on an EC2 instance serving as the docker host.
 
-
-
-
 ## Setting Up
 
 ### Manually Create Elastic IP
@@ -42,9 +39,28 @@ docker build -t heyo-world .
 
 ### Deploy Docker Container
 
-
 ```bash
 docker run -t -i -p 80:80 heyo-world
 ```
 
+### Notes
+
+## Controlling the docker host from my local machine
+
+```bash
+# free socket if previously linked
+unlink /tmp/socket.remote
+
+# tunnels /tmp/socket.remote (local) to /var/run/docker.sock (on remote machine)
+ssh -i ~/.ssh/dgserv-test-server-key-20190802.key -nNT -L /tmp/socket.remote:/var/run/docker.sock centos@35.166.158.11 &
+export TUNNEL_PID=$!
+export DOCKER_HOST=unix:///tmp/socket.remote
+
+# use docker, docker-compose, whatever
+docker-compose... 
+
+# when finished, shutdown and cleanup of the socket
+kill $TUNNEL_PID
+rm -f /tmp/socket.remote
+```
 
