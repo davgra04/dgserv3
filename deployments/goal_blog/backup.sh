@@ -23,7 +23,7 @@ sleep 2
 
 # back up files
 echo "Backing up ${BACKUP_NAME}..."
-docker cp -a goalblog:/goalblog ./${BACKUP_NAME}
+/usr/local/bin/docker cp -a goalblog:/goalblog ./${BACKUP_NAME}
 tar -zcvf ${BACKUP_NAME}.tgz ${BACKUP_NAME}
 rm -r ${BACKUP_NAME}
 
