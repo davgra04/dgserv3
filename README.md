@@ -18,12 +18,32 @@ ssh-keygen -t rsa -C this-is-my-server-key -f ~/.ssh/whatever.key
 
 ### Create .tfvars File
 
-TODO
+Put the following in a .tfvars file:
+
+```bash
+# elastic ip to associate instance with
+eip_allocation_id = "eipalloc-d3adb33fd3adb33f"
+
+# ip to whitelist for SSH
+my_ip = "8.8.8.8"
+
+# server instance size
+dgserv_instance_type = "t2.medium"
+
+# key we created above
+key_name = "this-is-my-server-key"
+private_key_path = "~/.ssh/whatever.key"
+public_key_path = "~/.ssh/whatever.key.pub"
+```
 
 ### Launch Instance
 
 ```bash
+# Make sure to set the terraform workspace when managing multiple deployments!
 cd tf/
+terraform workspace select my-space
+
+# init and launch
 terraform init
 terraform apply -var-file="deployment_20191031.tfvars" --auto-approve
 ```
@@ -52,12 +72,12 @@ docker run -t -i -p 80:80 heyo-world
 unlink /tmp/socket.remote
 
 # tunnels /tmp/socket.remote (local) to /var/run/docker.sock (on remote machine)
-ssh -i ~/.ssh/dgserv-test-server-key-20190802.key -nNT -L /tmp/socket.remote:/var/run/docker.sock centos@35.166.158.11 &
+ssh -i ~/.ssh/whatever.key -nNT -L /tmp/socket.remote:/var/run/docker.sock centos@35.166.158.11 &
 export TUNNEL_PID=$!
 export DOCKER_HOST=unix:///tmp/socket.remote
 
 # use docker, docker-compose, whatever
-docker-compose... 
+docker-compose...
 
 # when finished, shutdown and cleanup of the socket
 kill $TUNNEL_PID

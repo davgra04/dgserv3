@@ -1,0 +1,100 @@
+[global]
+  sendAnonymousUsage = false
+
+################################################################
+# Logging
+################################################################
+
+# Traefik logs
+[log]
+  filePath = "/var/log/traefik.log"
+  format = "json"
+  level = "INFO"
+
+# Access logs
+[accessLog]
+  filePath = "/var/log/access.log"
+  format = "json"
+
+################################################################
+# entryPoints
+################################################################
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+  [entryPoints.websecure]
+    address = ":443"
+    # [entryPoints.websecure.tls]
+
+# Enable retry sending request if network error
+[retry]
+
+################################################################
+# routers
+################################################################
+
+[http.routers.http_catchall]
+  entryPoints = ["web"]
+  middlewares = ["https_redirect"]
+  rule = "HostRegexp(`{any:.+}`)"
+  # service = "noop"
+
+[http.routers.traefik]
+  entryPoints = ["websecure"]
+  rule = "Host(`traefik.example.com`)"
+  service = "api@internal"
+  [http.routers.traefik.tls]
+    certResolver = "myresolver"
+    [[http.routers.traefik.tls.domains]]
+      main = "example.com"
+      sans = ["*.example.com"]
+
+################################################################
+# services
+################################################################
+
+[http.services]
+  # noop service, the URL will never be called
+  [http.services.noop.loadBalancer]
+    [[http.services.noop.loadBalancer.servers]]
+      url = "http://192.168.0.1:1337"
+
+################################################################
+# middlewares
+################################################################
+
+[http.middlewares]
+  [http.middlewares.https_redirect.redirectScheme]
+    scheme = "https"
+    permanent = true
+
+################################################################
+# Web configuration backend
+################################################################
+
+# Enable web configuration backend
+# https://docs.traefik.io/configuration/api/
+[api]
+  # entryPoint = "traefik"
+  dashboard = true
+  insecure = true
+  debug = false
+
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
+
+################################################################
+# certificatesResolvers
+################################################################
+
+[certificatesResolvers.myresolver.acme]
+  email = "myemail@whatever.com"
+  storage = "acme.json"
+  [certificatesResolvers.myresolver.acme.tlsChallenge]
+    # used during the challenge
+    # entryPoint = "websecure"
+
+# watch configuration for changes
+[file]
+  watch = true

@@ -9,7 +9,7 @@ services:
       # tells traefik to route traffic with Host goals.${DOMAIN} to goalblog
       - "traefik.http.routers.goalblog.rule=Host(`goals.${DOMAIN}`)"
       # enable automatic certificate generation
-      - "traefik.http.routers.goalblog.tls.certresolver=le"
+      - "traefik.http.routers.goalblog.tls.certresolver=myresolver"
       - "traefik.http.routers.goalblog.entrypoints=websecure"
       # tell traefik to use different port
       - "traefik.http.services.goalblog.loadbalancer.server.port=8080"
