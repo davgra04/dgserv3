@@ -9,26 +9,19 @@ services:
       # tells traefik to route traffic with Host goals.${DOMAIN} to goalblog
       - "traefik.http.routers.goalblog.rule=Host(`goals.${DOMAIN}`)"
       # enable automatic certificate generation
-      - "traefik.http.routers.goalblog.tls.certresolver=myresolver"
+      - "traefik.http.routers.goalblog.tls.certresolver=le"
       - "traefik.http.routers.goalblog.entrypoints=websecure"
       # tell traefik to use different port
       - "traefik.http.services.goalblog.loadbalancer.server.port=8080"
-      # use dgserv3_network
-      - "traefik.docker.network=dgserv3_network"
+      # use dgserv3
+      - "traefik.docker.network=dgserv3"
 
     restart: unless-stopped
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://drawio:8080 || exit 1"]
-    #   interval: 1m30s
-    #   timeout: 10s
-    #   retries: 5
-    #   start_period: 10s
-    # ports:
-    #   - "443:80"
+
     networks:
-      - dgserv3_network
+      - dgserv3
 
 networks:
-  dgserv3_network:
-    name: dgserv3_network
+  dgserv3:
+    name: dgserv3
     external: true

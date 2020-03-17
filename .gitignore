@@ -3,9 +3,11 @@
 # My .gitignore additions
 ####################################################################################################
 
-dgserv*-variables.env
+dgserv*vars.env
 deployment*.tfvars
 traefik*.toml
+
+.vscode
 
 ####################################################################################################
 # Created by https://www.gitignore.io/api/terraform

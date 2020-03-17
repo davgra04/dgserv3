@@ -7,8 +7,8 @@ import (
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "heyo boyo")
-	fmt.Fprintf(w, "path: %s!", r.URL.Path[1:])
+	fmt.Fprintf(w, "heyo boyo\n\n")
+	fmt.Fprintf(w, "path: %s", r.URL.Path)
 }
 
 func main() {

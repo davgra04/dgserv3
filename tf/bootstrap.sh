@@ -34,5 +34,7 @@ sudo systemctl start docker
 sudo groupadd docker
 sudo usermod -aG docker centos
 
+# create dir for docker volumes
+mkdir /home/centos/dgserv
 
 echo "HEYO BOYO! I picked meself up by me bootstraps!"

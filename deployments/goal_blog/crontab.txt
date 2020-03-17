@@ -1,2 +1,2 @@
 # back up goal blog every night at 1:00am
-0 1 * * *   bash /Users/devgru/code/dgserv3/deployments/goal_blog/backup.sh >> /Users/devgru/code/dgserv3/deployments/goal_blog/backup.log 2>&1
+0 1 * * *   bash /Users/devgru/code/dgserv/dgserv3/deployments/goal_blog/backup.sh >> /Users/devgru/code/dgserv/dgserv3/deployments/goal_blog/backup.log 2>&1

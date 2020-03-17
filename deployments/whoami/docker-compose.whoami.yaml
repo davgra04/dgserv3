@@ -9,17 +9,17 @@ services:
       # tells traefik to route traffic with Host whoami.${DOMAIN} to whoami
       - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)"
       # enable automatic certificate generation
-      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
+      - "traefik.http.routers.whoami.tls.certresolver=le"
       - "traefik.http.routers.whoami.entrypoints=websecure"
-      # use dgserv3_network
-      - "traefik.docker.network=dgserv3_network"
+      # use dgserv3
+      # - "traefik.docker.network=dgserv3"
 
     restart: unless-stopped
 
     networks:
-      - dgserv3_network
+      - dgserv3
 
 networks:
-  dgserv3_network:
-    name: dgserv3_network
+  dgserv3:
+    name: dgserv3
     external: true

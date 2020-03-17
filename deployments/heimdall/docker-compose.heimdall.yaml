@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  heimdall:
+    image: "linuxserver/heimdall"
+    container_name: heimdall
+
+    labels:
+      # tells traefik to route traffic with Host heimdall.${DOMAIN} to heimdall
+      - "traefik.http.routers.heimdall.rule=Host(`dashboard.${DOMAIN}`)"
+      # enable automatic certificate generation
+      - "traefik.http.routers.heimdall.tls.certresolver=le"
+      - "traefik.http.routers.heimdall.entrypoints=websecure"
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+
+    volumes:
+      - /home/centos/heimdall/config:/config
+
+    restart: unless-stopped
+
+    networks:
+      - dgserv3
+
+networks:
+  dgserv3:
+    name: dgserv3
+    external: true

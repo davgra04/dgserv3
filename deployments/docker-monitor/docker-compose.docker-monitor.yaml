@@ -1,0 +1,78 @@
+version: '3.5'
+
+services:
+
+  dmon-influxsrv:
+    image: tutum/influxdb:latest
+    container_name: dmon-influxsrv
+    # ports:
+    #   - "8083:8083"
+    #   - "8086:8086"
+    # expose:
+    #   - "8090"
+    #   - "8099"
+    environment:
+      - PRE_CREATE_DB=dmon-cadvisor
+    labels:
+      # tells traefik to route traffic with Host whoami.${DOMAIN} to whoami
+      - "traefik.http.routers.dmon-influxsrv.rule=Host(`dmon-influxsrv.${DOMAIN}`)"
+      # enable automatic certificate generation
+      - "traefik.http.routers.dmon-influxsrv.tls.certresolver=le"
+      - "traefik.http.routers.dmon-influxsrv.entrypoints=websecure"
+      # set port
+      - "traefik.http.services.dmon-influxsrv.loadbalancer.server.port=8083"
+    networks:
+      - dgserv3
+
+  dmon-cadvisor:
+    image: google/cadvisor
+    container_name: dmon-cadvisor
+    command: -storage_driver=influxdb -storage_driver_db=dmon-cadvisor -storage_driver_host=dmon-influxsrv:8086
+    # ports:
+    #   - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    # links:
+    #   - dmon-influxsrv:dmon-influxsrv
+    labels:
+      # tells traefik to route traffic with Host whoami.${DOMAIN} to whoami
+      - "traefik.http.routers.dmon-cadvisor.rule=Host(`dmon-cadvisor.${DOMAIN}`)"
+      # enable automatic certificate generation
+      - "traefik.http.routers.dmon-cadvisor.tls.certresolver=le"
+      - "traefik.http.routers.dmon-cadvisor.entrypoints=websecure"
+      # set port
+      - "traefik.http.services.dmon-cadvisor.loadbalancer.server.port=8080"
+    networks:
+      - dgserv3
+
+  dmon-grafana:
+    image: grafana/grafana
+    container_name: dmon-grafana
+    # ports:
+    #   - "3000:3000"
+    # links:
+    #   - dmon-influxsrv:dmon-influxsrv
+    environment:
+      - INFLUXDB_HOST=localhost
+      - INFLUXDB_PORT=8086
+      - INFLUXDB_NAME=dmon-cadvisor
+      - INFLUXDB_USER=root
+      - INFLUXDB_PASS=root
+    labels:
+      # tells traefik to route traffic with Host whoami.${DOMAIN} to whoami
+      - "traefik.http.routers.dmon-grafana.rule=Host(`dmon-grafana.${DOMAIN}`)"
+      # enable automatic certificate generation
+      - "traefik.http.routers.dmon-grafana.tls.certresolver=le"
+      - "traefik.http.routers.dmon-grafana.entrypoints=websecure"
+      # set port
+      - "traefik.http.services.dmon-grafana.loadbalancer.server.port=3000"
+    networks:
+      - dgserv3
+
+networks:
+  dgserv3:
+    # name: dgserv3
+    external: true

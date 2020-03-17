@@ -38,3 +38,9 @@ docker-compose --env-file=../../dgserv-variables.env -f docker-compose.goal_blog
 Simply run `backup.sh`. This tunnels the docker socket according to dgserv-variables.env.
 
 Also included is `crontab.txt`, a crontab entry for backing up daily at 1:00am
+
+## Restoring to goalblog container
+
+Use `docker cp` to copy `tiddlers/` and `tiddlywiki.info` on to the target container. Restart the container for changes to take effect.
+
+

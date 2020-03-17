@@ -3,23 +3,54 @@ version: '3.5'
 services:
 
   traefik:
-    image: "traefik:v2.1.6"
+    image: "traefik:v2.1"
     container_name: "traefik"
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+      # - "8080:8080"
     volumes:
-      - "/home/centos/acme.json:/acme.json"                   # let's encrypt certificates
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"        # docker socket for traefik monitoring
-      - "/home/centos/traefik.toml:/etc/traefik/traefik.toml" # traefik config
-      - "/home/centos/traefik.log:/var/log/traefik.log"       # traefik logs
-      - "/home/centos/access.log:/var/log/access.log"         # traefik access log
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"    # docker socket for traefik monitoring
+      - "/home/centos/dgserv/traefik:/dgserv"             # holds configs, logs, and acme.json
+    command:
+      - --global.sendAnonymousUsage=false
+      - --providers.docker
+      - --api
+      # - --api.insecure                      # temporarily allow insecure api access for debugging
+      # logging
+      - --log.filePath=/dgserv/traefik.log
+      - --log.level=INFO
+      - --accesslog=true
+      - --accesslog.filepath=/dgserv/access.log
+      # entryPoints
+      - --entryPoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      # Let's Encrypt certs
+      - --certificatesresolvers.le.acme.email=${EMAIL}
+      - --certificatesresolvers.le.acme.storage=/dgserv/acme.json
+      - --certificatesresolvers.le.acme.tlschallenge=true
+    labels:
+      # middlewares
+      #   redirect-to-https middleware
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      #   basic auth middleware
+      - "traefik.http.middlewares.global-auth.basicauth.users=${DGSERV_BASICAUTH_USER}"
+      # routers
+      #   traefik dashboard router
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls.certresolver=le"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.middlewares=global-auth"
+      #   http-catchall router
+      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.entrypoints=web"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+
     networks:
-      - dgserv3_network
+      - dgserv3
 
 networks:
-  dgserv3_network:
-    name: dgserv3_network
-
-
+  dgserv3:
+    name: dgserv3

@@ -3,9 +3,10 @@
 # set -x
 
 # get vars
-source /Users/devgru/code/dgserv3/dgserv-variables.env
+source /Users/devgru/code/dgserv/dgserv3/dgserv-devgru.cc-vars.env
 BACKUP_DATE=$(date +%F_%H%M%S)
 BACKUP_NAME=goalblog.${BACKUP_DATE}.bak
+BACKUP_DIR=/Users/devgru/code/dgserv/dgserv3/deployments/goal_blog
 
 echo "####################################################################################################"
 echo "#  ${BACKUP_NAME}"
@@ -23,7 +24,7 @@ sleep 2
 
 # back up files
 echo "Backing up ${BACKUP_NAME}..."
-/usr/local/bin/docker cp -a goalblog:/goalblog ./${BACKUP_NAME}
+/usr/local/bin/docker cp -a goalblog:/goalblog ${BACKUP_DIR}/${BACKUP_NAME}
 tar -zcvf ${BACKUP_NAME}.tgz ${BACKUP_NAME}
 rm -r ${BACKUP_NAME}
 
